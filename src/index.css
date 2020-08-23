@@ -1,13 +1,52 @@
-body {
-  margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+.calculatorPageContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
-code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-    monospace;
+.calculatorField{
+  width: 280px;
+}
+.calculatorTitle{
+  margin-top: 20px;
+}
+
+.itemCostControlContainer{
+  margin-top: 20px;
+}
+
+.itemCostControl {
+}
+
+.shippingCostControlContainer {
+  margin-top: 20px;
+}
+
+.shippingCostControl {
+}
+
+.itemCategoryInputContainer {
+  margin-top: 20px;
+}
+.itemCategoryInput {
+}
+
+.calculateButtonContainer{
+  margin-top: 50px
+}
+.calculateButton {
+}
+
+.resultArea {
+  margin-top:40px;
+  width:280px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.resultAreaValue {
+  color: aqua;
+  font-size: 24px;
+  font-weight: bold;
 }
