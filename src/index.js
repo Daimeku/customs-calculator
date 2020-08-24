@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { TextField, FormControl, InputLabel, Input, InputAdornment, Button } from '@material-ui/core';
+import { TextField, FormControl, InputAdornment, Button } from '@material-ui/core';
 import Autocomplete from '@material-ui/lab/Autocomplete';
 
 import './index.css';
@@ -42,7 +42,7 @@ class CustomsCalculator extends React.Component {
         error: false,
         errorMessage: ''
       },
-      totalCharges: '324234234'
+      totalCharges: ''
     }
   }
  
@@ -116,11 +116,30 @@ class CustomsCalculator extends React.Component {
   }
 
   //use this to do the actual maths
-  calculateTotalShippingCost = (itemCost, shippingCost, itemCategory) => {
-    //get the percentage from the item category
-    //multiply the percentage by item cost+shipping cost and add it to the original item cost
-    console.log(itemCategory.ratePercentage);
-    let totalCharges = (itemCost + shippingCost) * (itemCategory.ratePercentage/100);
+  calculateTotalShippingCost = (itemCost, shippingCost, itemCategory, freightType = "air") => {
+    itemCost = Number(itemCost);
+    shippingCost = Number(shippingCost);
+
+    //convert to jmd then do this
+    let calculationDetails = {};
+    let insuranceRate = freightType === "air"? 0.01 : 0.015;
+    let insuranceCost = insuranceRate * (itemCost + shippingCost);
+    let cif = itemCost + shippingCost + insuranceCost;
+    let importDuty = cif * (itemCategory.ratePercentage/100);
+    let environmentalLevy = cif * 0.005;
+    let scf = cif * 0.003;
+    let stampDuty = cif > 5500 ? 100 : 5;
+    let caf = cif > 5500 ? 2500 : 0;
+    let gct = (cif + caf + environmentalLevy + importDuty + scf) * 0.175;    
+
+    console.log("cif: ", cif);
+    console.log("caf: ", caf);
+    console.log("environmentalLevy: ", environmentalLevy);
+    console.log("gct: ", gct);
+    console.log("import duty: ",importDuty); 
+    console.log("scf: ", scf);
+    let totalCharges = importDuty + environmentalLevy + scf + stampDuty + caf + gct;
+
     return totalCharges;
   }
 
@@ -130,11 +149,7 @@ class CustomsCalculator extends React.Component {
     number = Number(number);
     if(number === 0)
       return '';
-    let numberFormat = new Intl.NumberFormat(
-      "EN-US",
-      {
-        maximumSignificantDigits: 3,
-      });
+    let numberFormat = new Intl.NumberFormat("EN-US");
     return numberFormat.format(number);
   }
 
