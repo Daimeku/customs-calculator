@@ -50,7 +50,8 @@ class CustomsCalculator extends React.Component {
     event.preventDefault();
     let fieldName = event.target.name;
     let fieldObject = this.state[fieldName];
-    fieldObject.value = event.target.value;
+    let newValue = event.target.value.replace(/\D/g,'');
+    fieldObject.value = newValue;
     //@Todo - validation
     
     this.setState({[fieldName] : fieldObject});
@@ -109,13 +110,32 @@ class CustomsCalculator extends React.Component {
       return;
     }
     //call the calculate function
-    
+    let totalCharges = this.calculateTotalShippingCost(itemCost.value, shippingCost.value, itemCategory.value);
+
+    this.setState({totalCharges});
   }
 
   //use this to do the actual maths
   calculateTotalShippingCost = (itemCost, shippingCost, itemCategory) => {
     //get the percentage from the item category
     //multiply the percentage by item cost+shipping cost and add it to the original item cost
+    console.log(itemCategory.ratePercentage);
+    let totalCharges = (itemCost + shippingCost) * (itemCategory.ratePercentage/100);
+    return totalCharges;
+  }
+
+
+  formatCurrency = (number) => {
+    number = number.replace(/\D/g,'');
+    number = Number(number);
+    if(number === 0)
+      return '';
+    let numberFormat = new Intl.NumberFormat(
+      "EN-US",
+      {
+        maximumSignificantDigits: 3,
+      });
+    return numberFormat.format(number);
   }
 
   render() {
@@ -130,7 +150,7 @@ class CustomsCalculator extends React.Component {
               id="standard-adornment-amount"
               name="itemCost"
               label="Item Cost"
-              value={this.state.itemCost.value}
+              value={this.formatCurrency(this.state.itemCost.value)}
               onChange={this.handleFieldChange}
               InputProps={{
                 startAdornment: <InputAdornment position="start">$</InputAdornment>
@@ -147,7 +167,7 @@ class CustomsCalculator extends React.Component {
             <TextField
               name="shippingCost"
               label="Shipping Cost"
-              value={this.state.shippingCost.value}
+              value={this.formatCurrency(this.state.shippingCost.value)}
               onChange={this.handleFieldChange}
               InputProps={{
                 startAdornment: <InputAdornment position="start">$</InputAdornment>
@@ -167,7 +187,7 @@ class CustomsCalculator extends React.Component {
             renderInput={(params) => <TextField {...params}
               error={this.state.itemCategory.error}
               helperText={this.state.itemCategory.errorMessage}
-              label="TextFieldOption" 
+              label="Item Category" 
               variant="outlined"
             />
             }
