@@ -47,11 +47,20 @@
   width: 280px;
   display:flex;
   justify-content: space-between;
+  align-items: center;
 }
 
+.calculationDetailsRow:hover {
+  background-color: azure;
+}
 .resultAreaDetailsSwitch {
   margin-top: 10px;
   display: flex;
   justify-content: space-between;
+  align-items: center;
+}
+
+.tooltipContainer {
+  display: flex;
   align-items: center;
 }
