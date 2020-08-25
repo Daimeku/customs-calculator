@@ -2,6 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import { TextField, FormControl, InputAdornment, Button, Switch } from '@material-ui/core';
 import Autocomplete from '@material-ui/lab/Autocomplete';
+import NumberFormat from 'react-number-format';
 
 import './index.css';
 
@@ -26,32 +27,32 @@ const DetailSection = (props) => (
   <div className="resultAreaDetails">
     <div className="cifContainer calculationDetailsRow">
       <p>CIF: </p>
-      <p>{props.calculationDetails.cif}</p>
+      <NumberFormat value={props.calculationDetails.cif} displayType="text" thousandSeparator={true} prefix={'$'} decimalScale={2}/>
     </div>
 
     <div className="importDutyContainer calculationDetailsRow">
       <p>Import Duty: </p>
-      <p>{props.calculationDetails.importDuty}</p>
+      <NumberFormat value={props.calculationDetails.importDuty} displayType="text" thousandSeparator={true} prefix={'$'} decimalScale={2}/>
     </div>
 
     <div className="gctContainer calculationDetailsRow">
       <p>GCT:</p>
-      <p>{props.calculationDetails.gct}</p>
+      <NumberFormat value={props.calculationDetails.gct} displayType="text" thousandSeparator={true} prefix={'$'}  decimalScale={2}/>
     </div>
 
     <div className="stampDutyContainer calculationDetailsRow">
       <p>Stamp Duty:</p>
-      <p>{props.calculationDetails.stampDuty}</p>
+      <NumberFormat value={props.calculationDetails.stampDuty} displayType="text" thousandSeparator={true} prefix={'$'} decimalScale={2}/>
     </div>
 
     <div className="stampDutyContainer calculationDetailsRow">
       <p>SCF:</p>
-      <p>{props.calculationDetails.scf}</p>
+      <NumberFormat value={props.calculationDetails.scf} displayType="text" thousandSeparator={true} prefix={'$'} decimalScale={2}/>
     </div>
 
     <div className="stampDutyContainer calculationDetailsRow">
       <p>CAF:</p>
-      <p>{props.calculationDetails.caf}</p>
+      <NumberFormat value={props.calculationDetails.caf} displayType="text" thousandSeparator={true} prefix={'$'} decimalScale={2} />
     </div>
 
   </div>
@@ -194,19 +195,47 @@ class CustomsCalculator extends React.Component {
       gct,
       totalCharges
     };
+
     return calculationDetails;
   }
 
 
   formatCurrency = (number) => {
-    number = number.replace(/\D/g, '');
+    number = String(number);
+    // number = number.replace(/\D/g, '');
+    number = number.replace(/[^0-9.]/g,'');
     number = Number(number);
     if (number === 0)
       return '';
-    let numberFormat = new Intl.NumberFormat("EN-US");
+    let numberFormat = new Intl.NumberFormat("en-US", {
+      
+    });
     return numberFormat.format(number);
   }
 
+  formatCalculationDetails = (calculationDetails) => {
+    let cif = this.formatCurrency(calculationDetails.cif);
+    let importDuty = this.formatCurrency(calculationDetails.importDuty);
+    let environmentalLevy = this.formatCurrency(calculationDetails.environmentalLevy);
+    let scf = this.formatCurrency(calculationDetails.scf);
+    let stampDuty = this.formatCurrency(calculationDetails.stampDuty);
+    let caf = this.formatCurrency(calculationDetails.caf);
+    let gct = this.formatCurrency(calculationDetails.gct);
+    let totalCharges = this.formatCurrency(calculationDetails.totalCharges);
+
+    calculationDetails = {
+      importDuty,
+      environmentalLevy,
+      scf,
+      stampDuty,
+      caf,
+      cif,
+      gct,
+      totalCharges
+    };
+
+    return calculationDetails;
+  }
   getAdornment = () => {
     return {
       startAdornment: <InputAdornment position="start">$</InputAdornment>
@@ -279,7 +308,9 @@ class CustomsCalculator extends React.Component {
 
         <div className="resultArea">
           <div className="resultsAreaTitle">Total Import Charges</div>
-          <div className="resultAreaValue">{this.state.calculationDetails.totalCharges}</div>
+          <div className="resultAreaValue">
+            <NumberFormat value={this.state.calculationDetails.totalCharges} displayType="text" thousandSeparator={true} prefix={'$'} decimalScale={2}/>
+          </div>
 
           <div className="resultAreaDetailsSwitch">
           <p>show details</p>
