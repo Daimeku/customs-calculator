@@ -5,7 +5,7 @@ const CUSTOMS_CATEGORIES = [
         "subCategoryId": "90.10.10",
         "description": "Race horses, not for breeding",
         "ratePercentage": 40,
-        "label": "Race heese"
+        "label": "Race Heese"
     },
     {
         "parentCategoryId": "0501",

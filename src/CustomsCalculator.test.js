@@ -1,48 +1,80 @@
-import '@testing-library/jest-dom'
-import React from 'react'
+import React from 'react';
+import { shallow, mount } from 'enzyme';
+import { Switch } from '@material-ui/core';
+
 import CustomsCalculator from './CustomsCalculator';
-import { render, screen, fireEvent } from '@testing-library/react';
 
-// beforeEach(() => {
-//     render(<CustomsCalculator/>);
-// });
 
-test('renders all the fields correctly', () => {
-    render(<CustomsCalculator/>);
+let state = {
+    itemCost: {
+        value: '1000',
+        error: false,
+        errorMessage: ''
+    },
+    shippingCost: {
+        value: '100',
+        error: false,
+        errorMessage: ''
+    },
+    itemCategory: {
+        value: {
+            parentCategoryId: "0101",
+            subCategoryId: "90.10.10",
+            description: "Race horses, not for breeding",
+            ratePercentage: 40,
+            label: "Race Heese"
+        },
+        error: false,
+        errorMessage: ''
+    },
+    calculationDetails: {
+        importDuty: '',
+        environmentalLevy: '',
+        scf: '',
+        stampDuty: '',
+        caf: '',
+        gct: '',
+        totalCharges: '',
+        cif: ''
+    },
+    showDetails: {
+        value: false
+    }
+}
+let container;
 
-    expect(screen.getByLabelText('Item Cost')).toBeInTheDocument();
-    expect(screen.getByLabelText('Shipping Cost')).toBeInTheDocument();
-    expect(screen.getByTestId('itemCategoryField')).toBeInTheDocument();
-    expect(screen.getByTestId("totalChargesValue")).toBeInTheDocument();
-});
+describe("main calculator tests", () => {
+    beforeAll = () => {
+        container = shallow(<CustomsCalculator/>);
+    }
+    
+    it("renders the page correctly", () => {
+        let container = shallow(<CustomsCalculator/>);
+        expect(container.find(".calculateButton").length).toEqual(1);
+        expect(container.find(".shippingCostControlContainer").length).toEqual(1);
+    });
+    
+    it("calculates a value when calculate button is clicked", () => {
+        let container = shallow(<CustomsCalculator/>);
+        container.setState({...state});
+        container.find(".calculateButton").simulate("click");
+        console.log(container.state("itemCost"));
+        expect(container.state("calculationDetails").totalCharges).toBe(732.0384000000001);
+    });
 
-test('get a value on calculate', () => {
-    let container = render(<CustomsCalculator />);
-    let itemCategoryField = screen.getByLabelText('Item Category');
-    let itemCategoryComponent = screen.getByTestId("itemCategoryField");
+    it("gets an error message when no values are entered", () => {
+        let container = shallow(<CustomsCalculator/>);
+        container.find(".calculateButton").simulate("click");
+        expect(container.state("itemCost").error).toEqual(true);
+        expect(container.state("itemCategory").error).toEqual(true);
+    });
 
-    // let itemCategoryField = screen.getByRole("textbox");
-    itemCategoryField.focus();
-    itemCategoryComponent.focus();
-    // fireEvent.change(itemCategoryField, {target: {value: "r"}});
-    fireEvent.click(itemCategoryComponent);
-    fireEvent.keyDown(itemCategoryComponent, {key: 'Arrow Down'});
-    fireEvent.keyDown(itemCategoryComponent, {key: 'Arrow Down'});
 
-    fireEvent.keyDown(itemCategoryComponent, {key: 'Arrow Down'});
-    fireEvent.keyDown(itemCategoryComponent, {key: 'Enter'});
-    expect(itemCategoryField.value).toBe("Race Heese");
-    fireEvent.change(screen.getByLabelText('Item Cost'), {target: {value: "1000"}});
-    fireEvent.change(screen.getByLabelText('Shipping Cost'), {target: { value: "100"}});
-    // fireEvent.change(screen.getByTestId('itemCategoryField'), {},"Race Heece");
-    fireEvent.click(screen.getByText("Calculate"));
-    expect(screen.getByTestId("totalChargesValue")).toContain("$732.04");
-});
+    it("displays the details when switch is clicked", () => {
+        let container = mount(<CustomsCalculator/>);
+        container.instance().handleFieldChange({target: {checked: true, name: "showDetails"}});
+        expect(container.state("showDetails").value).toEqual(true);
+    });
 
-// test('it displays details section on toggle', () => {
-//     expect(screen.getByTestId('showDetailsSwitch')).toBeInTheDocument();    
-//     fireEvent.click(screen.getByTestId('showDetailsSwitch'));
-//     fireEvent.change(screen.getByTestId('showDetailsSwitch'), {target: {checked: true}});
-//     expect(screen.getByTestId('detailSection').value).toBeInTheDocument();
 
-// });
+})
