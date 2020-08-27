@@ -3,6 +3,7 @@ import { shallow, mount } from 'enzyme';
 import { Switch } from '@material-ui/core';
 
 import CustomsCalculator from './CustomsCalculator';
+import DetailSection from './DetailSection';
 
 
 let state = {
@@ -55,11 +56,12 @@ describe("main calculator tests", () => {
     });
     
     it("calculates a value when calculate button is clicked", () => {
-        let container = shallow(<CustomsCalculator/>);
+        let container = mount(<CustomsCalculator/>);
         container.setState({...state});
-        container.find(".calculateButton").simulate("click");
+        container.find(".calculateButton").first().simulate("click");
         console.log(container.state("itemCost"));
         expect(container.state("calculationDetails").totalCharges).toBe(732.0384000000001);
+        expect(container.find(".resultAreaValue").text()).toBe("$732.04");
     });
 
     it("gets an error message when no values are entered", () => {
@@ -70,10 +72,11 @@ describe("main calculator tests", () => {
     });
 
 
-    it("displays the details when switch is clicked", () => {
+    it("displays the details when switch is clicked", async () => {
         let container = mount(<CustomsCalculator/>);
-        container.instance().handleFieldChange({target: {checked: true, name: "showDetails"}});
+        container.find(".resultAreaDetailsSwitch").first().props().onChange({target: {checked: true, name: "showDetails"}});
         expect(container.state("showDetails").value).toEqual(true);
+        // expect(container.find(".calculationDetailsRow").exists()).toBe(true);;
     });
 
 

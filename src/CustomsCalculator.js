@@ -280,7 +280,6 @@ class CustomsCalculator extends React.Component {
                             onChange={this.handleFieldChange}
                             color="primary"
                             name="showDetails"
-                            data-testid="showDetailsSwitch"
                             className="resultAreaDetailsSwitch"
                         />
                     </div>

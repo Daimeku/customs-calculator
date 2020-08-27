@@ -5,7 +5,7 @@ import HelpOutlineOutlinedIcon from '@material-ui/icons/HelpOutlineOutlined';
 import toolTips from './toolTips';
 
 const DetailSection = (props) => (
-    <div className="resultAreaDetails" data-testid="detailSection">
+    <div className="resultAreaDetails">
         <div className="cifContainer calculationDetailsRow">
 
             <Tooltip title={toolTips.cif}>
