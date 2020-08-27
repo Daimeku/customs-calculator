@@ -1,13 +1,16 @@
-FROM node:current-slim
+FROM node:current-slim as node
 
 WORKDIR /app/customs-calc
 
-COPY package.json .
+ENV PATH /app/customs-calc/node_modules/.bin:$PATH
+
+COPY . ./
 
 RUN npm install
 
-EXPOSE 3000
+RUN npm run build
 
-CMD ["npm", "start"]
-
-COPY . .
+FROM nginx:stable-alpine
+COPY --from=node /app/customs-calc/build /usr/share/nginx/html
+EXPOSE 80
+CMD ["nginx", "-g", "daemon off;"]
