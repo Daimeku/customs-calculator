@@ -133,7 +133,7 @@ class CustomsCalculator extends React.Component {
         let scf = cif * 0.003;
         let stampDuty = cif > 5500 ? 100 : 5;
         let caf = cif > 5500 ? 2500 : 0;
-        let gct = (cif + caf + environmentalLevy + importDuty + scf) * 0.175;
+        let gct = (cif + caf + environmentalLevy + importDuty + scf) * 0.15;
         let totalCharges = importDuty + environmentalLevy + scf + stampDuty + caf + gct;
         console.log(JSON.stringify(itemCategory));
         console.log("item cat value", itemCategory.value);
