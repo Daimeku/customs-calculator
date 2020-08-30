@@ -18,12 +18,19 @@ let state = {
         errorMessage: ''
     },
     itemCategory: {
-        value: {
-            parentCategoryId: "0101",
-            subCategoryId: "90.10.10",
-            description: "Race horses, not for breeding",
-            ratePercentage: 40,
-            label: "Race Heese"
+        value:     {
+            chapter: "Vehicles other than railway or tramway rolling",
+            chapterCode: "87",
+            subChapter: "Bodies (including cabs), for the motor vehicles of headings  87.01 to 87.05.",
+            subChapterCode: "8707",
+            subHeading: "Other:",
+            subHeadingCode: "870790",
+            code: "8707909023",
+            description: "Other bodies (including cabs) for the motor vehicles of 87.05 imported for use in agriculture",
+            gct: "16.50",
+            importDuty: "0.00",
+            scf: "-",
+            environmentalLevy : "0.50"
         },
         error: false,
         errorMessage: ''
@@ -60,8 +67,8 @@ describe("main calculator tests", () => {
         container.setState({...state});
         container.find(".calculateButton").first().simulate("click");
         console.log(container.state("itemCost"));
-        expect(container.state("calculationDetails").totalCharges).toBe(732.0384000000001);
-        expect(container.find(".resultAreaValue").text()).toBe("$732.04");
+        expect(container.state("calculationDetails").totalCharges).toBe(194.78657500000003);
+        expect(container.find(".resultAreaValue").text()).toBe("$194.79");
     });
 
     it("gets an error message when no values are entered", () => {
