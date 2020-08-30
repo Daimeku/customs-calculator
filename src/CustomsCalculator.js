@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Fragment } from 'react';
 import ReactDOM from 'react-dom';
 import { TextField, FormControl, InputAdornment, Button, Switch } from '@material-ui/core';
 import Autocomplete from '@material-ui/lab/Autocomplete';
@@ -61,7 +61,7 @@ class CustomsCalculator extends React.Component {
     handleAutocompleteChange = (event, newValue) => {
         // event.preventDefault();
         console.log("newValue: ", JSON.stringify(newValue));
-        for(let field in newValue) {
+        for (let field in newValue) {
             console.log(newValue[field]);
         }
         let itemCategory = this.state.itemCategory;
@@ -128,12 +128,16 @@ class CustomsCalculator extends React.Component {
         let insuranceRate = freightType === "air" ? 0.01 : 0.015;
         let insuranceCost = insuranceRate * (itemCost + shippingCost);
         let cif = itemCost + shippingCost + insuranceCost;
-        let importDuty = cif * (itemCategory.ratePercentage / 100);
-        let environmentalLevy = cif * 0.005;
-        let scf = cif * 0.003;
+        let importDuty = cif * (itemCategory.importDuty / 100);
+        let environmentalLevy = cif * (itemCategory.environmentalLevy / 100);
+        let scf = 0;
+        if (itemCategory.scf !== "-") {
+            scf = cif * (itemCategory.scf / 100);
+        }
+
         let stampDuty = cif > 5500 ? 100 : 5;
         let caf = cif > 5500 ? 2500 : 0;
-        let gct = (cif + caf + environmentalLevy + importDuty + scf) * 0.15;
+        let gct = (cif + caf + environmentalLevy + importDuty + scf) * (itemCategory.gct / 100);
         let totalCharges = importDuty + environmentalLevy + scf + stampDuty + caf + gct;
         console.log(JSON.stringify(itemCategory));
         console.log("item cat value", itemCategory.value);
@@ -242,7 +246,15 @@ class CustomsCalculator extends React.Component {
                         name="itemCategoryInput"
                         className="itemCategoryInput calculatorField"
                         options={CUSTOMS_CATEGORIES}
-                        getOptionLabel={(category) => category.label}
+                        getOptionLabel={(category) => category.subChapter.concat(" - ").concat(category.description)}
+                        groupBy={(category) => category.chapter}
+                        renderOption={(category) => (
+                            <Fragment>
+                                <span className="optionTextContainer">
+                                    <span className="optionText">{category.subChapter.concat(" - ").concat(category.description)}</span>
+                                </span>
+                            </Fragment>
+                        )}
                         renderInput={(params) => <TextField {...params}
                             error={this.state.itemCategory.error}
                             helperText={this.state.itemCategory.errorMessage}
