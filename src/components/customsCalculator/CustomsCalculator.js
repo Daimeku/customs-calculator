@@ -1,25 +1,11 @@
-import React, { Fragment } from 'react';
-import ReactDOM from 'react-dom';
-import PropTypes from 'prop-types';
+import React from 'react';
 import { TextField, FormControl, InputAdornment, Button, Switch } from '@material-ui/core';
-import Autocomplete from '@material-ui/lab/Autocomplete';
 import NumberFormat from 'react-number-format';
 import DetailSection from './DetailSection';
-import CUSTOMS_CATEGORIES from './customsCategories';
+import CUSTOMS_CATEGORIES from '../../constants/customsCategories';
 import FlexSearch from 'flexsearch';
-import { default as ListboxComponent, CustomSubHeader } from './ListboxComponent';
-import CategoriesList from './CategoriesList';
+import CategoriesList from '../categoriesList/CategoriesList';
 import './index.css';
-
-
-
-
-export const renderGroup = (params) => [
-    <CustomSubHeader key={params.key} group={params.group} component="div">
-        {/* {params.group} */}
-    </CustomSubHeader>,
-    params.children,
-];
 
 class CustomsCalculator extends React.Component {
 
@@ -78,14 +64,12 @@ class CustomsCalculator extends React.Component {
             }
         });
 
-        console.log(CUSTOMS_CATEGORIES.length);
         for (let i = 0; i < CUSTOMS_CATEGORIES.length; i++) {
             this.index.add(CUSTOMS_CATEGORIES[i]);
         }
     }
 
     handleFieldChange = (event) => {
-        // event.preventDefault();
         let fieldName = event.target.name;
         let fieldObject = this.state[fieldName];
         let newValue;
@@ -100,8 +84,6 @@ class CustomsCalculator extends React.Component {
     }
 
     handleCategoryFieldChange = (event) => {
-        // event.preventDefault();
-        
         let newValue = event.target.value;
         let itemCategory = this.state.itemCategory;
         itemCategory.label = newValue;
@@ -109,40 +91,26 @@ class CustomsCalculator extends React.Component {
         //@Todo - validation
         let searchResults = this.index.search(newValue, 25);
         let suggestions = this.convertSearchResultsToSuggestions(searchResults);
-        console.log(searchResults);
         this.setState({ itemCategory, suggestions });
     }
-
+    //passed to CategoriesList
     handleCategorySelected = (category) => {
-        console.log("category selected", category);
         let itemCategory = this.state.itemCategory;
         itemCategory.value = category;
         itemCategory.label = category.description;
         this.setState({itemCategory});
     }
-
+    isCurrentItemSelected = (item) => {
+        let itemCategory = this.state.itemCategory;
+        if(itemCategory.value === '')
+            return false;
+        if ((item.code !== undefined) && (item.code === itemCategory.value.code))
+            return true;
+    }
     convertSearchResultsToSuggestions = (searchResults) => {
         let suggestions = {};
-        let structure = [
-            {
-                "name": "",
-                "subChapters": [
-                    {
-                        "name": "",
-                        "subHeadings": [
-                            {
-                                "name": "",
-                                "items": [
-                                    {}
-                                ]
-                            }
-                        ]
-                    }
-                ]
-            }
-        ];
 
-        let test = searchResults.map( searchItem => {
+        searchResults.map( searchItem => {
             
 
             if(suggestions[searchItem.chapter] === undefined)
@@ -155,16 +123,10 @@ class CustomsCalculator extends React.Component {
             suggestions[searchItem.chapter][searchItem.subChapter][searchItem.subHeading].push(searchItem);
             return searchItem;
         });
-        console.log(suggestions);
         return suggestions;
     }
 
     handleAutocompleteChange = (event, newValue) => {
-        // event.preventDefault();
-        console.log("newValue: ", JSON.stringify(newValue));
-        for (let field in newValue) {
-            console.log(newValue[field]);
-        }
         let itemCategory = this.state.itemCategory;
         if (newValue === null)
             newValue = '';
@@ -238,13 +200,8 @@ class CustomsCalculator extends React.Component {
 
         let stampDuty = cif > 5500 ? 100 : 5;
         let caf = cif > 5500 ? 2500 : 0;
-        let gct = (cif + caf + environmentalLevy + importDuty + scf) * (itemCategory.gct / 100);
+        let gct = (cif + caf + environmentalLevy + importDuty + scf) * 0.15;
         let totalCharges = importDuty + environmentalLevy + scf + stampDuty + caf + gct;
-        console.log(JSON.stringify(itemCategory));
-        console.log("item cat value", itemCategory.value);
-        console.log("itemcost: ", itemCost);
-        console.log("cif: ", cif);
-        console.log("totalCharges: ", totalCharges);
         let calculationDetails = {
             importDuty,
             environmentalLevy,
@@ -258,7 +215,6 @@ class CustomsCalculator extends React.Component {
 
         return calculationDetails;
     }
-
 
     formatCurrency = (number) => {
         number = String(number);
@@ -355,7 +311,7 @@ class CustomsCalculator extends React.Component {
 
                 </div>
                 <div>
-                    <CategoriesList data={this.state.suggestions} subHeader="chapters" handleCategorySelected={this.handleCategorySelected}/>
+                    <CategoriesList data={this.state.suggestions} subHeader="chapters" handleCategorySelected={this.handleCategorySelected} isCurrentItemSelected={this.isCurrentItemSelected} />
                 </div>
                 <div className="calculateButtonContainer">
                     <Button

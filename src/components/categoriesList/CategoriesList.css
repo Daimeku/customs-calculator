@@ -5,3 +5,7 @@
 .itemCategoryListContainer{
     max-width: 350px;
 }
+
+.selectedListItem {
+    background-color: aquamarine;
+}
