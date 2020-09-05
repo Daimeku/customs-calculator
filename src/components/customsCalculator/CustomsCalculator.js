@@ -1,10 +1,10 @@
-import React, { Fragment } from 'react';
-import ReactDOM from 'react-dom';
+import React from 'react';
 import { TextField, FormControl, InputAdornment, Button, Switch } from '@material-ui/core';
-import Autocomplete from '@material-ui/lab/Autocomplete';
 import NumberFormat from 'react-number-format';
 import DetailSection from './DetailSection';
-import CUSTOMS_CATEGORIES from './customsCategories';
+import CUSTOMS_CATEGORIES from '../../constants/customsCategories';
+import FlexSearch from 'flexsearch';
+import CategoriesList from '../categoriesList/CategoriesList';
 import './index.css';
 
 class CustomsCalculator extends React.Component {
@@ -25,7 +25,8 @@ class CustomsCalculator extends React.Component {
             itemCategory: {
                 value: '',
                 error: false,
-                errorMessage: ''
+                errorMessage: '',
+                label: ''
             },
             calculationDetails: {
                 importDuty: '',
@@ -37,14 +38,38 @@ class CustomsCalculator extends React.Component {
                 totalCharges: '',
                 cif: ''
             },
+            testAutoComplete: {
+                value: '',
+                error: false,
+                errorMessage: ''
+            },
             showDetails: {
                 value: false
+            },
+            suggestions: {}
+        }
+
+    }
+
+    componentDidMount() {
+        this.index = new FlexSearch({
+            doc: {
+                id: "code",
+                field: [
+                    "chapter",
+                    "subChapter",
+                    "subHeading",
+                    "description"
+                ]
             }
+        });
+
+        for (let i = 0; i < CUSTOMS_CATEGORIES.length; i++) {
+            this.index.add(CUSTOMS_CATEGORIES[i]);
         }
     }
 
     handleFieldChange = (event) => {
-        // event.preventDefault();
         let fieldName = event.target.name;
         let fieldObject = this.state[fieldName];
         let newValue;
@@ -58,12 +83,50 @@ class CustomsCalculator extends React.Component {
         this.setState({ [fieldName]: fieldObject });
     }
 
+    handleCategoryFieldChange = (event) => {
+        let newValue = event.target.value;
+        let itemCategory = this.state.itemCategory;
+        itemCategory.label = newValue;
+        this.setState({itemCategory})
+        //@Todo - validation
+        let searchResults = this.index.search(newValue, 25);
+        let suggestions = this.convertSearchResultsToSuggestions(searchResults);
+        this.setState({ itemCategory, suggestions });
+    }
+    //passed to CategoriesList
+    handleCategorySelected = (category) => {
+        let itemCategory = this.state.itemCategory;
+        itemCategory.value = category;
+        itemCategory.label = category.description;
+        this.setState({itemCategory});
+    }
+    isCurrentItemSelected = (item) => {
+        let itemCategory = this.state.itemCategory;
+        if(itemCategory.value === '')
+            return false;
+        if ((item.code !== undefined) && (item.code === itemCategory.value.code))
+            return true;
+    }
+    convertSearchResultsToSuggestions = (searchResults) => {
+        let suggestions = {};
+
+        searchResults.map( searchItem => {
+            
+
+            if(suggestions[searchItem.chapter] === undefined)
+                suggestions[searchItem.chapter] = {};
+            if(suggestions[searchItem.chapter][searchItem.subChapter] === undefined)
+                suggestions[searchItem.chapter][searchItem.subChapter] = {};
+            if(suggestions[searchItem.chapter][searchItem.subChapter][searchItem.subHeading] === undefined)
+                suggestions[searchItem.chapter][searchItem.subChapter][searchItem.subHeading] = [];
+
+            suggestions[searchItem.chapter][searchItem.subChapter][searchItem.subHeading].push(searchItem);
+            return searchItem;
+        });
+        return suggestions;
+    }
+
     handleAutocompleteChange = (event, newValue) => {
-        // event.preventDefault();
-        console.log("newValue: ", JSON.stringify(newValue));
-        for (let field in newValue) {
-            console.log(newValue[field]);
-        }
         let itemCategory = this.state.itemCategory;
         if (newValue === null)
             newValue = '';
@@ -137,13 +200,8 @@ class CustomsCalculator extends React.Component {
 
         let stampDuty = cif > 5500 ? 100 : 5;
         let caf = cif > 5500 ? 2500 : 0;
-        let gct = (cif + caf + environmentalLevy + importDuty + scf) * (itemCategory.gct / 100);
+        let gct = (cif + caf + environmentalLevy + importDuty + scf) * 0.15;
         let totalCharges = importDuty + environmentalLevy + scf + stampDuty + caf + gct;
-        console.log(JSON.stringify(itemCategory));
-        console.log("item cat value", itemCategory.value);
-        console.log("itemcost: ", itemCost);
-        console.log("cif: ", cif);
-        console.log("totalCharges: ", totalCharges);
         let calculationDetails = {
             importDuty,
             environmentalLevy,
@@ -157,7 +215,6 @@ class CustomsCalculator extends React.Component {
 
         return calculationDetails;
     }
-
 
     formatCurrency = (number) => {
         number = String(number);
@@ -242,30 +299,20 @@ class CustomsCalculator extends React.Component {
                 </div>
 
                 <div className="itemCategoryInputContainer">
-                    <Autocomplete
-                        name="itemCategoryInput"
-                        className="itemCategoryInput calculatorField"
-                        options={CUSTOMS_CATEGORIES}
-                        getOptionLabel={(category) => category.subChapter.concat(" - ").concat(category.description)}
-                        groupBy={(category) => category.chapter}
-                        renderOption={(category) => (
-                            <Fragment>
-                                <span className="optionTextContainer">
-                                    <span className="optionText">{category.subChapter.concat(" - ").concat(category.description)}</span>
-                                </span>
-                            </Fragment>
-                        )}
-                        renderInput={(params) => <TextField {...params}
-                            error={this.state.itemCategory.error}
-                            helperText={this.state.itemCategory.errorMessage}
-                            label="Item Category"
-                            variant="outlined"
-                        />
-                        }
-                        onChange={this.handleAutocompleteChange}
+                    <TextField className="calculatorField"
+                        id="testAutoComplete"
+                        name="testAutoComplete"
+                        label="Category"
+                        value={this.state.itemCategory.label}
+                        onChange={this.handleCategoryFieldChange}
+                        error={this.state.itemCategory.error}
+                        helperText={this.state.itemCategory.errorMessage}
                     />
-                </div>
 
+                </div>
+                <div>
+                    <CategoriesList data={this.state.suggestions} subHeader="chapters" handleCategorySelected={this.handleCategorySelected} isCurrentItemSelected={this.isCurrentItemSelected} />
+                </div>
                 <div className="calculateButtonContainer">
                     <Button
                         className="calculateButton"
@@ -275,7 +322,7 @@ class CustomsCalculator extends React.Component {
                         data-testid="calculateButton"
                     >
                         Calculate
-            </Button>
+                    </Button>
                 </div>
 
 

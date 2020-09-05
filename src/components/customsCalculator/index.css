@@ -67,5 +67,21 @@
 
 .optionTextContainer {
   border-bottom:solid;
+  /* overflow: hidden !important; */
+  /* background-color:blue; */
   width: 100%;
+}
+
+.listSubHeader{
+  background-color: aquamarine;
+}
+
+
+.listItemContainer {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  /* border: solid; */
+  max-height: 80px;
+  /* height: fit-content; */
+  /* padding-top: 5px; */
 }

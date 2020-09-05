@@ -33,7 +33,8 @@ let state = {
             environmentalLevy : "0.50"
         },
         error: false,
-        errorMessage: ''
+        errorMessage: '',
+        label: ""
     },
     calculationDetails: {
         importDuty: '',
@@ -66,9 +67,8 @@ describe("main calculator tests", () => {
         let container = mount(<CustomsCalculator/>);
         container.setState({...state});
         container.find(".calculateButton").first().simulate("click");
-        console.log(container.state("itemCost"));
-        expect(container.state("calculationDetails").totalCharges).toBe(194.78657500000003);
-        expect(container.find(".resultAreaValue").text()).toBe("$194.79");
+        expect(container.state("calculationDetails").totalCharges).toBe(178.03825);
+        expect(container.find(".resultAreaValue").text()).toBe("$178.04");
     });
 
     it("gets an error message when no values are entered", () => {
