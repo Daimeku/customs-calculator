@@ -1,6 +1,8 @@
 import React from 'react';
 import { List, ListItem, Collapse } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
+import ExpandLess from '@material-ui/icons/ExpandLess';
+import ExpandMore from '@material-ui/icons/ExpandMore';
 import './CategoriesList.css';
 
 const useStyles = makeStyles((theme) => ({
@@ -13,6 +15,23 @@ const useStyles = makeStyles((theme) => ({
         paddingLeft: theme.spacing(4),
     },
 }));
+
+const CategoryListHeader = (props) => {
+    return (
+        <div className="CategoryListHeader">
+            <div>
+                {props.text}
+            </div>
+            {
+                props.hasList ?
+                    <div>
+                        {props.showList ? <ExpandMore /> : <ExpandLess />}
+                    </div>
+                    : null
+            }
+        </div>
+    );
+}
 
 class CategoriesList extends React.Component {
     constructor(props) {
@@ -53,8 +72,8 @@ class CategoriesList extends React.Component {
     }
 
     getItemOnClickHandler = (index, key) => {
-        if(this.state.showSubList)
-            return () =>this.setShowList(index);
+        if (this.state.showSubList)
+            return () => this.setShowList(index);
         else
             return () => this.props.handleCategorySelected(key);
     }
@@ -67,17 +86,21 @@ class CategoriesList extends React.Component {
                     aria-labelledby="nested-list-subheader"
                 >
                     {
-                        this.convertDataToArray(this.props.data).map( (key, index) => {
+                        this.convertDataToArray(this.props.data).map((key, index) => {
                             return (
                                 <div>
                                     <ListItem button onClick={this.getItemOnClickHandler(index, key)} key={key} selected={this.props.isCurrentItemSelected(key)}>
-                                        {this.state.showSubList ? key : key.description}
+                                        {
+                                            this.state.showSubList ?
+                                                <CategoryListHeader text={key} showList={this.state.showList[index]} hasList/> :
+                                                <CategoryListHeader text={key.description} showList={this.state.showList[index]} />
+                                        }
                                     </ListItem>
 
                                     <Collapse in={this.state.showList[index]} unmountOnExit className="categorySubList">
                                         {
-                                            this.state.showSubList?
-                                                <CategoriesList data={this.props.data[key]} handleCategorySelected={this.props.handleCategorySelected} isCurrentItemSelected={this.props.isCurrentItemSelected}/>:
+                                            this.state.showSubList ?
+                                                <CategoriesList data={this.props.data[key]} handleCategorySelected={this.props.handleCategorySelected} isCurrentItemSelected={this.props.isCurrentItemSelected} /> :
                                                 null
                                         }
                                     </Collapse>

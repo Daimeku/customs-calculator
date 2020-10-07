@@ -1,5 +1,6 @@
 .categorySubList {
-    padding-left: 10px;
+    padding-left: 15px;
+    margin-top: 5px;
 }
 
 .itemCategoryListContainer{
@@ -8,4 +9,9 @@
 
 .selectedListItem {
     background-color: aquamarine;
+}
+
+.CategoryListHeader {
+    display: flex;
+    justify-content: space-between;
 }

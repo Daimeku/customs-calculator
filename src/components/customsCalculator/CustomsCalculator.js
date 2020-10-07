@@ -302,7 +302,7 @@ class CustomsCalculator extends React.Component {
                     <TextField className="calculatorField"
                         id="testAutoComplete"
                         name="testAutoComplete"
-                        label="Category"
+                        label="Item Category"
                         value={this.state.itemCategory.label}
                         onChange={this.handleCategoryFieldChange}
                         error={this.state.itemCategory.error}
