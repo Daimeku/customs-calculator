@@ -53,18 +53,21 @@ let state = {
 let container;
 
 describe("main calculator tests", () => {
-    beforeAll = () => {
-        container = shallow(<CustomsCalculator/>);
-    }
+
+    beforeEach(()=> {
+        container = mount(<CustomsCalculator/>);
+    });
+
+    afterEach(() => {
+        container.unmount();
+    });
     
     it("renders the page correctly", () => {
-        let container = shallow(<CustomsCalculator/>);
-        expect(container.find(".calculateButton").length).toEqual(1);
-        expect(container.find(".shippingCostControlContainer").length).toEqual(1);
+        expect(container.find(".calculateButton").length).toBeGreaterThan(0);
+        expect(container.find(".shippingCostControlContainer").length).toBeGreaterThan(0);
     });
     
     it("calculates a value when calculate button is clicked", () => {
-        let container = mount(<CustomsCalculator/>);
         container.setState({...state});
         container.find(".calculateButton").first().simulate("click");
         expect(container.state("calculationDetails").totalCharges).toBe(178.03825);
@@ -72,19 +75,23 @@ describe("main calculator tests", () => {
     });
 
     it("gets an error message when no values are entered", () => {
-        let container = shallow(<CustomsCalculator/>);
-        container.find(".calculateButton").simulate("click");
+        container.find(".calculateButton").first().simulate("click");
+        container.update();
         expect(container.state("itemCost").error).toEqual(true);
         expect(container.state("itemCategory").error).toEqual(true);
+        expect(container.find("#itemCostField-helper-text").first().text()).toBe("Please enter the cost of your item.");
+        expect(container.find("#shippingCostField-helper-text").first().text()).toBe("Please enter the cost of shipping your item.");
+        expect(container.find("#itemCategoryField-helper-text").first().text()).toBe("Please select a category for your item.");
     });
 
 
     it("displays the details when switch is clicked", async () => {
-        let container = mount(<CustomsCalculator/>);
         container.find(".resultAreaDetailsSwitch").first().props().onChange({target: {checked: true, name: "showDetails"}});
+        container.update();
         expect(container.state("showDetails").value).toEqual(true);
-        // expect(container.find(".calculationDetailsRow").exists()).toBe(true);;
-    });
+        expect(container.find(".resultAreaDetails").exists()).toBe(true);
+        expect(container.find(".gctContainer").exists()).toBe(true);
+    }); 
 
 
 })

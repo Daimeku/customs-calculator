@@ -67,8 +67,6 @@
 
 .optionTextContainer {
   border-bottom:solid;
-  /* overflow: hidden !important; */
-  /* background-color:blue; */
   width: 100%;
 }
 
@@ -80,8 +78,13 @@
 .listItemContainer {
   overflow: hidden;
   text-overflow: ellipsis;
-  /* border: solid; */
   max-height: 80px;
-  /* height: fit-content; */
-  /* padding-top: 5px; */
+}
+
+.selectItemLabelContainer {
+  display: flex;
+  justify-content: center;
+  margin-top:10px;
+  margin-bottom:20px;
+  width: 350px;
 }

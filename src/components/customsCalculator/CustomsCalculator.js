@@ -38,17 +38,11 @@ class CustomsCalculator extends React.Component {
                 totalCharges: '',
                 cif: ''
             },
-            testAutoComplete: {
-                value: '',
-                error: false,
-                errorMessage: ''
-            },
             showDetails: {
                 value: false
             },
             suggestions: {}
         }
-
     }
 
     componentDidMount() {
@@ -93,6 +87,7 @@ class CustomsCalculator extends React.Component {
         let suggestions = this.convertSearchResultsToSuggestions(searchResults);
         this.setState({ itemCategory, suggestions });
     }
+
     //passed to CategoriesList
     handleCategorySelected = (category) => {
         let itemCategory = this.state.itemCategory;
@@ -100,6 +95,7 @@ class CustomsCalculator extends React.Component {
         itemCategory.label = category.description;
         this.setState({itemCategory});
     }
+
     isCurrentItemSelected = (item) => {
         let itemCategory = this.state.itemCategory;
         if(itemCategory.value === '')
@@ -107,6 +103,7 @@ class CustomsCalculator extends React.Component {
         if ((item.code !== undefined) && (item.code === itemCategory.value.code))
             return true;
     }
+
     convertSearchResultsToSuggestions = (searchResults) => {
         let suggestions = {};
 
@@ -277,7 +274,6 @@ class CustomsCalculator extends React.Component {
                             InputProps={this.state.itemCost.value === '' ? null : this.getInputProps("itemCostField")}
                             error={this.state.itemCost.error}
                             helperText={this.state.itemCost.errorMessage}
-                        // data-testid="itemCostField"
                         />
                     </FormControl>
                 </div>
@@ -300,8 +296,8 @@ class CustomsCalculator extends React.Component {
 
                 <div className="itemCategoryInputContainer">
                     <TextField className="calculatorField"
-                        id="testAutoComplete"
-                        name="testAutoComplete"
+                        id="itemCategoryField"
+                        name="itemCategory"
                         label="Item Category"
                         value={this.state.itemCategory.label}
                         onChange={this.handleCategoryFieldChange}
@@ -310,8 +306,12 @@ class CustomsCalculator extends React.Component {
                     />
 
                 </div>
-                <div>
-                    <CategoriesList data={this.state.suggestions} subHeader="chapters" handleCategorySelected={this.handleCategorySelected} isCurrentItemSelected={this.isCurrentItemSelected} />
+                <div className="categoryListContainer">
+                    <div className="selectItemLabelContainer">Select an item from below</div>
+
+                    <div>
+                        <CategoriesList data={this.state.suggestions} subHeader="chapters" handleCategorySelected={this.handleCategorySelected} isCurrentItemSelected={this.isCurrentItemSelected} />
+                    </div> 
                 </div>
                 <div className="calculateButtonContainer">
                     <Button
@@ -351,7 +351,6 @@ class CustomsCalculator extends React.Component {
                 </div>
 
             </div>
-
         );
     }
 }
