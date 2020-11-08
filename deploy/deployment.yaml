@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: customs-calculator-deploy
+  labels:
+    app: customs-calculator
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: customs-calculator
+  template:
+    metadata:
+      labels:
+        app: customs-calculator
+    spec:
+      containers:
+      - name: customs-calculator
+        image: customs-calculator:latest
+        imagePullPolicy: Never
+        ports:
+        - containerPort: 80
